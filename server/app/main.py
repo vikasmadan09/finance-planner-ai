@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from .routes import router
 from .db import database
 import uvicorn
+import os
 
 
 @asynccontextmanager
@@ -50,7 +51,7 @@ def run():
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
-        port=8000,
+        port=int(os.getenv("PORT", 8000)),
         reload=False  # Set to False in production
     )
 
