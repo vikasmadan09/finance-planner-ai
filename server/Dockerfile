@@ -7,6 +7,7 @@ COPY . .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
+ENV ENVIRONMENT=production
 ENV PYTHONPATH=/app
 
 RUN pip install .
