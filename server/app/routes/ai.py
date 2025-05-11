@@ -12,7 +12,7 @@ import os
 load_dotenv()
 
 router = APIRouter()
-print("GEMINI_API_KEY is:", os.getenv("GEMINI_API_KEY"))
+
 genai.configure(api_key = os.getenv("GEMINI_API_KEY"))
 
 @router.post("/suggest")

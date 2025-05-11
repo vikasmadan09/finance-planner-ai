@@ -53,7 +53,7 @@ async def update_expense(expense_id: UUID, update_data: ExpenseUpdate = Body(...
             raise HTTPException(status_code=400, details="No valid fields provided for  update.")
         
         set_clause = ", ".join(update_fields)
-        print('Set clause', set_clause)
+
         query= f"""
             UPDATE expenses
             SET {set_clause}

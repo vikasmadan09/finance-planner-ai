@@ -23,7 +23,6 @@ def get_current_user(authorization: str = Header(...)):
         user_id = payload.get("sub")  # Supabase sets 'sub' as user ID
         if not user_id:
             raise HTTPException(status_code=401, detail="Missing user_id in token")
-        print("user id", user_id)
         return user_id
     except ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
