@@ -16,7 +16,6 @@ export interface NotificationProps {
 }
 
 export const Notification: React.FC<NotificationProps> = ({
-  id,
   type,
   message,
   onClose,

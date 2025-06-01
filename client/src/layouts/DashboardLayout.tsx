@@ -1,13 +1,10 @@
-import React, { useState, useEffect, createContext } from "react";
+import { useState, useEffect, createContext } from "react";
 import axios from "axios";
 import { ENV } from "@/core/config";
 import Navbar from "@/components/Navbar";
 import { Outlet } from "react-router-dom";
 import SplashScreen from "@/components/splash/Splash";
-import {
-  NotificationProvider,
-  useNotification,
-} from "@/context/NotificationContext";
+import { useNotification } from "@/context/NotificationContext";
 
 interface UserContextType {
   country: string;

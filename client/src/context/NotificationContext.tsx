@@ -2,10 +2,10 @@ import React, { createContext, useContext, useState, useCallback } from "react";
 import { Notification } from "../components/notification";
 
 const NotificationContext = createContext({
-  success: (msg: string) => {},
-  error: (msg: string) => {},
-  warning: (msg: string) => {},
-  info: (msg: string) => {},
+  success: (_msg: string) => {},
+  error: (_msg: string) => {},
+  warning: (_msg: string) => {},
+  info: (_msg: string) => {},
 });
 
 export const useNotification = () => useContext(NotificationContext);

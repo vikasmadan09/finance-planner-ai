@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ExpenseChart from "../components/ExpenseChart";
 import AddExpense from "./AddExpense";
 import axios from "axios";
@@ -74,6 +74,8 @@ export default function Dashboard() {
       setExpenses(data);
     } catch (error) {
       console.error("Error fetching expenses:", error);
+      notify.error("Failed to fetch expenses");
+      setExpenses([]);
     }
   };
 
