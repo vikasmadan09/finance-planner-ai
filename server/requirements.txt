@@ -9,3 +9,8 @@ pydantic
 python-jose
 dotenv
 google-generativeai
+requests
+supabase
+starlette
+pycountry
+babel

@@ -1,10 +1,11 @@
 from fastapi import FastAPI
-# from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from .routes import router
 from .db import database
 import uvicorn
 import os
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -14,27 +15,26 @@ async def lifespan(app: FastAPI):
     # Shutdown logic
     await database.disconnect()
 
+
 app = FastAPI(lifespan=lifespan)
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
-# ONCE FE DOMAIN IS READY
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["https://your-frontend.com"],
-#     allow_credentials=True,
-#     allow_methods=["GET", "POST", "PUT", "DELETE"],
-#     allow_headers=["*"],
-# )
+origins = [
+    "http://localhost:5000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/health")
 def read_root():
-    return { "status": "healthy"}
+    return {"status": "healthy"}
+
 
 # if __name__ == "__main__":
 #     import uvicorn
@@ -51,18 +51,16 @@ app.include_router(router)
 # async def shutdown():
 #     await database.disconnect()
 
-is_dev = os.getenv("ENVIRONMENT","development") == "development"
+is_dev = os.getenv("ENVIRONMENT", "development") == "development"
+
 
 # Optional: run function for launching via `python main.py`
 def run():
     uvicorn.run(
-        "app.main:app",
-        host="0.0.0.0",
-        port=int(os.getenv("PORT", 8000)),
-        reload=is_dev
+        "app.main:app", host="0.0.0.0", port=int(os.getenv("PORT", 8000)), reload=is_dev
     )
+
 
 # Ensure it only runs when executed directly
 if __name__ == "__main__":
     run()
-    
