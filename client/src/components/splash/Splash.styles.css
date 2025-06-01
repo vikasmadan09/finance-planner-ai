@@ -1,0 +1,28 @@
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  background-color: #2d3133;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* prevent scrollbars */
+}
+
+.splash-logo {
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;
+  animation: fadeIn 5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+  }
+}

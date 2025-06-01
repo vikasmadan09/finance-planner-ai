@@ -1,0 +1,30 @@
+.banner-wrapper {
+  width: 100%;
+  overflow: hidden;
+  background: #222;
+  color: white;
+  padding: 1rem 0;
+  white-space: nowrap;
+  position: relative;
+}
+
+.banner-track {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scroll-left 20s linear infinite;
+}
+
+.banner-text {
+  display: inline-block;
+  font-size: 1.2rem;
+  padding-right: 3rem;
+}
+
+@keyframes scroll-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
