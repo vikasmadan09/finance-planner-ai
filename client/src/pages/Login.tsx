@@ -23,6 +23,7 @@ export const Login = () => {
     country: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -46,7 +47,8 @@ export const Login = () => {
       password,
       // country
     } = formData;
-    const response = await axios(`${ENV.API_URL}/auth/login`, {
+    setIsLoading(true);
+    axios(`${ENV.API_URL}/auth/login`, {
       method: "POST",
       data: {
         email: username,
@@ -57,14 +59,18 @@ export const Login = () => {
         "Content-Type": "application/json",
       },
       withCredentials: true,
-    });
-
-    if (response.status !== 200) {
-      notify.error("Login failed");
-      return;
-    }
-    notify.success("Login successful");
-    navigate("/dashboard");
+    })
+      .then(() => {
+        notify.success("Login successful");
+        setTimeout(() => {
+          navigate("/dashboard");
+          setIsLoading(false);
+        }, 3000);
+      })
+      .catch(() => {
+        setIsLoading(false);
+        notify.error("Login failed");
+      });
   };
 
   return (
@@ -115,7 +121,10 @@ export const Login = () => {
               </option>
             ))}
           </select> */}
-          <button className="w-full bg-[var(--accent-600)] text-white p-2 rounded hover:bg-[var(--accent-700)] cursor-pointer">
+          <button
+            className="w-full bg-[var(--accent-600)] text-white p-2 rounded hover:bg-[var(--accent-700)] cursor-pointer disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+            disabled={isLoading}
+          >
             Login
           </button>
         </form>

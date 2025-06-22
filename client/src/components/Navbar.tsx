@@ -4,7 +4,7 @@ import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar({ showLinks = true }) {
   return (
-    <nav className="flex justify-between items-center max-h-15 p-4 bg-[var(--secondary-200)] ">
+    <nav className="flex justify-between items-center max-h-15 p-4 bg-[var(--secondary-300)] text-[var(--text-900)]">
       {/* <h1 className="text-xl font-bold">Finance Planner</h1> */}
       <img src={logo} alt="Logo" className="h-13 w-13" />
       {showLinks && (

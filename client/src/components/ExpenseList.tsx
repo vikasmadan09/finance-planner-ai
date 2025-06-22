@@ -1,6 +1,6 @@
 import React from "react";
 import { format } from "date-fns";
-
+import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { toZonedTime } from "date-fns-tz";
 import {
   useReactTable,
@@ -15,18 +15,29 @@ import {
 } from "@tanstack/react-table";
 import SkeletonTable from "./SkeletonTable";
 
-type Expense = {
+export type Expense = {
   date: string;
   category: string;
-  amount: string;
+  amount: number;
   display_amount: string;
+  id: string;
+  item: string;
+  notes: string;
 };
 
 interface ExpenseListProps {
   expenses: Expense[];
+  tableDataLoading?: boolean;
+  handleEdit: (expense: Expense) => void;
+  handleDelete: (expense: Expense) => void;
 }
 
-export default function ExpenseList({ expenses }: ExpenseListProps) {
+export default function ExpenseList({
+  expenses,
+  tableDataLoading,
+  handleEdit,
+  handleDelete,
+}: ExpenseListProps) {
   const [globalFilter, setGlobalFilter] = React.useState("");
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -53,7 +64,7 @@ export default function ExpenseList({ expenses }: ExpenseListProps) {
         header: "Item",
         accessorKey: "item",
         filterFn: "includesString",
-        cell: (info) => `${info.getValue()}`, // Optional: format amount
+        cell: (info) => `${info.getValue()}`,
       },
       {
         header: "Category",
@@ -67,8 +78,32 @@ export default function ExpenseList({ expenses }: ExpenseListProps) {
         filterFn: "includesString",
         cell: (info) => info.getValue(),
       },
+      {
+        header: "Actions",
+        id: "actions",
+        cell: ({ row }) => (
+          <div className="flex gap-2">
+            <button
+              aria-label="Edit"
+              className="text-blue-600 hover:text-blue-800"
+              onClick={() => handleEdit(row.original)}
+              type="button"
+            >
+              <PencilSquareIcon className="h-4 w-4" />
+            </button>
+            <button
+              aria-label="Delete"
+              className="text-red-600 hover:text-red-800"
+              onClick={() => handleDelete(row.original)}
+              type="button"
+            >
+              <TrashIcon className="h-4 h-4" />
+            </button>
+          </div>
+        ),
+      },
     ],
-    []
+    [userTimeZone]
   );
 
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -154,7 +189,7 @@ export default function ExpenseList({ expenses }: ExpenseListProps) {
               </React.Fragment>
             ))}
           </thead>
-          {expenses.length > 0 ? (
+          {!tableDataLoading ? (
             <tbody className="divide-y divide-gray-200">
               {table.getRowModel().rows.map((row) => (
                 <tr key={row.id} className="hover:bg-gray-50">

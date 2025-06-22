@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ENV } from "./core/config";
+import { useNotification } from "./context/NotificationContext";
 
 export default function PrivateRoute() {
+  const navigate = useNavigate();
+  const notify = useNotification();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -18,7 +21,11 @@ export default function PrivateRoute() {
         } else {
           setIsAuthenticated(false);
         }
-      } catch (error) {
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error) && error.status === 401) {
+          notify.error("Session Expired. Please login!");
+          navigate("/");
+        }
         setIsAuthenticated(false);
       } finally {
         setLoading(false);

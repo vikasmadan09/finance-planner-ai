@@ -18,11 +18,11 @@ export default function AddExpense({
   const [notes, setNotes] = useState("");
   const [disabled, setDisabled] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setDisabled(true);
     setIsOpen(false);
-    const response = await axios(`${ENV.API_URL}/expenses`, {
+    axios(`${ENV.API_URL}/expenses`, {
       method: "POST",
       data: {
         item,
@@ -33,17 +33,21 @@ export default function AddExpense({
         "Content-Type": "application/json",
       },
       withCredentials: true,
-    });
-
-    if (response.status !== 200) {
-      notify.error("Add Expense failed");
-      return;
-    }
-    setItem("");
-    setAmount("");
-    setNotes("");
-    notify.success("Expense added successfully");
-    fetchExpenses();
+    })
+      .then(() => {
+        fetchExpenses();
+        notify.success("Expense added successfully");
+      })
+      .catch((error) => {
+        console.error("Error adding expense:", error);
+        notify.error("Add Expense failed");
+      })
+      .finally(() => {
+        setItem("");
+        setAmount("");
+        setNotes("");
+        setDisabled(false);
+      });
   };
 
   return (
@@ -90,15 +94,20 @@ export default function AddExpense({
             <div className="flex justify-end space-x-2">
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  setItem("");
+                  setAmount("");
+                  setNotes("");
+                }}
                 className="px-4 py-2 text-gray-700 hover:underline"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                disabled={disabled}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                disabled={disabled || !item || !amount}
               >
                 Add
               </button>
