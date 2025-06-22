@@ -1,3 +1,4 @@
+from uuid import UUID
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
@@ -32,6 +33,19 @@ class ExpenseOut(ExpenseCreate):
     id: Optional[str] = None
     category: Optional[str] = None
     timestamp: datetime
+
+
+class ExpenseUpdateRequest(BaseModel):
+    id: UUID
+    amount: Optional[float] = Field(None, gt=0)
+    notes: Optional[str] = None
+    category: Optional[str] = None
+    timestamp: datetime
+
+
+class ExpenseUpdateResponse(BaseModel):
+    message: str
+    data: ExpenseUpdateRequest
 
 
 class ExpenseResponse(BaseModel):

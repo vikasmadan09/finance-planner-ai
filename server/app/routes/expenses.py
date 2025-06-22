@@ -7,7 +7,13 @@ from uuid import uuid4, UUID
 from typing import List, Optional
 from datetime import datetime, timedelta
 from ..db import database
-from ..schemas import ExpenseCreate, ExpenseOut, ExpenseUpdate, ExpenseResponse
+from ..schemas import (
+    ExpenseCreate,
+    ExpenseOut,
+    ExpenseUpdate,
+    ExpenseResponse,
+    ExpenseUpdateResponse,
+)
 from ..routes.auth import get_current_user
 from .helper import get_currency_symbol_from_location
 from .auth import supabase_admin
@@ -41,7 +47,7 @@ CATEGORIES = [
 
 def generate_prompt(item_name: str) -> str:
     return f"""
-You are a personal finance assistant. Your task is to categorize user expenses.
+You are a personal finance assistant. Your task is to categorize user expenses into **one** of the predefined budget categories.
 
 Choose one of the following categories:
 {', '.join(CATEGORIES)}.
@@ -56,19 +62,42 @@ Examples:
 Now categorize the following:
 "{item_name}"
 
-Return only the category name.
+Return only with one category name from the list.
 """
 
 
 async def auto_categorize(item_name: str) -> str:
+    normalized_name = item_name.strip().lower()
     try:
+        query = "SELECT category FROM item_categories WHERE item_name = :item_name"
+        row = await database.fetch_one(
+            query=query, values={"item_name": normalized_name}
+        )
+        if row:
+            category = row["category"]
+            if category in CATEGORIES:
+                return category
+
         prompt = generate_prompt(item_name)
         response = genai.GenerativeModel(
             "gemini-2.5-flash-preview-04-17"
-        ).generate_content(prompt)
+        ).generate_content(prompt, generation_config={"temperature": 0})
+
         category = response.text.strip()
+
         if category not in CATEGORIES:
-            return "Miscellaneous"
+            category = "Miscellaneous"
+
+        # Store result in the database
+        insert_query = """
+            INSERT INTO item_categories (item_name, category)
+            VALUES (:item_name, :category)
+        """
+        await database.execute(
+            query=insert_query,
+            values={"item_name": normalized_name, "category": category},
+        )
+
         return category
     except Exception as e:
         print(f"[Gemini Error] {e}")
@@ -102,7 +131,7 @@ async def add_expense(expense: ExpenseCreate, user_id: str = Depends(get_current
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.put("/{expense_id}", response_model=ExpenseOut)
+@router.put("/{expense_id}", response_model=ExpenseUpdateResponse)
 async def update_expense(
     expense_id: UUID,
     update_data: ExpenseUpdate = Body(...),
@@ -120,7 +149,7 @@ async def update_expense(
             update_fields.append("category= :category")
             values["category"] = category
         if update_data.notes is not None:
-            update_fields.append("notes= :note")
+            update_fields.append("notes= :notes")
             values["notes"] = update_data.notes
 
         if not update_fields:
